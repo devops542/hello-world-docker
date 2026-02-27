@@ -1,0 +1,45 @@
+pipeline {
+
+agent any
+
+environment {
+    IMAGE_NAME = "rakesh199403/hello-world-docker"
+    DOCKER_CREDENTIALS = "dockerhub_credentials"
+}
+
+stages {
+
+    stage('Checkout Code') {
+        steps {
+            git branch: 'main',
+                credentialsId: 'github_credentials',
+                url: 'https://github.com/devops542/hello-world-docker.git'
+        }
+    }
+
+    stage('Build Docker Image') {
+        steps {
+            script {
+                dockerImage = docker.build("${IMAGE_NAME}:${BUILD_NUMBER}")
+            }
+        }
+    }
+
+    stage('Push Docker Image') {
+        steps {
+            script {
+                docker.withRegistry('', DOCKER_CREDENTIALS) {
+                    dockerImage.push()
+                }
+            }
+        }
+    }
+
+    stage('Cleanup') {
+        steps {
+            sh "docker rmi ${IMAGE_NAME}:${BUILD_NUMBER} || true"
+        }
+    }
+}
+
+}
