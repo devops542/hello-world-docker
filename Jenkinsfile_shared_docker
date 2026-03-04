@@ -1,0 +1,5 @@
+@Library('shared-lib@main') _
+
+buildApp(
+    repoName: 'hello-world-docker'
+)
